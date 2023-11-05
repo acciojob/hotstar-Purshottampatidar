@@ -28,45 +28,39 @@ public class WebSeriesService {
         //Dont forget to save the production and webseries Repo
 
         //checking that seriesName is present or not
-       WebSeries webSeries1=webSeriesRepository.findBySeriesName(webSeriesEntryDto.getSeriesName());
-       if(webSeries1!=null){
-           throw new Exception("Series is already present");
-       }
+        WebSeries webSeries=new WebSeries();
+        webSeries.setSeriesName(webSeriesEntryDto.getSeriesName());
+        webSeries.setAgeLimit(webSeriesEntryDto.getAgeLimit());
+        webSeries.setRating(webSeriesEntryDto.getRating());
+        webSeries.setSubscriptionType(webSeriesEntryDto.getSubscriptionType());
 
-        //updating the rating in production house;
-        ProductionHouse productionHouse=updateProductionHouse(webSeriesEntryDto.getProductionHouseId(),webSeriesEntryDto.getRating());
+        WebSeries checkSeries = webSeriesRepository.findBySeriesName(webSeries.getSeriesName());
+
+        if(checkSeries!=null){
+            throw new Exception("Series is already present");
+        }
+        ProductionHouse productionHouse=productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId()).get();
         if(productionHouse == null) {
             throw new Exception("Production house is not present");
         }
-        //creating webSeries
-        WebSeries webSeries=new WebSeries();
-              webSeries.setSeriesName(webSeriesEntryDto.getSeriesName());
-              webSeries.setAgeLimit(webSeriesEntryDto.getAgeLimit());
-              webSeries.setSubscriptionType(webSeriesEntryDto.getSubscriptionType());
-              webSeries.setRating(webSeriesEntryDto.getRating());
-              webSeries.setProductionHouse(productionHouse);
+        webSeries.setProductionHouse(productionHouse);
+        webSeries=webSeriesRepository.save(webSeries);
 
-        //setting FR's
-        productionHouse.getWebSeriesList().add(webSeries);
-        WebSeries currWeb=webSeriesRepository.save(webSeries);
-        return  currWeb.getId();
+        List<WebSeries> webSeriesList=productionHouse.getWebSeriesList();
+        webSeriesList.add(webSeries);
 
-    }
-    public ProductionHouse updateProductionHouse(Integer productionHouseId,double rating) {
-        Optional<ProductionHouse>  optionalProductionHouse=productionHouseRepository.findById(productionHouseId);
-        if(!optionalProductionHouse.isPresent()){
-            return null;
+        double productionHouseRating=0;
+
+        for(WebSeries webSeries1:webSeriesList){
+            productionHouseRating+=webSeries1.getRating();
         }
-        ProductionHouse currProductionHouse=optionalProductionHouse.get();
-        List<WebSeries> listOfWebSeries=currProductionHouse.getWebSeriesList();
+        int webSeriesCount=webSeriesList.size();
+        productionHouseRating=productionHouseRating/webSeriesCount;
 
-        double sum=rating;
-        for(WebSeries web: listOfWebSeries){
-            sum+=web.getRating();
-        }
-        int totalWeb=listOfWebSeries.size()+1;
-        double avgRating=sum/totalWeb;
-        currProductionHouse.setRatings(avgRating);
-        return productionHouseRepository.save(currProductionHouse);
+        productionHouse.setRatings(productionHouseRating);
+
+        productionHouseRepository.save(productionHouse);
+
+        return webSeries.getId();
     }
 }
