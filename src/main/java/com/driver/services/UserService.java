@@ -46,7 +46,7 @@ public class UserService {
         int countOfEliteWeb=0;
 
         for(WebSeries web : webSeriesList){
-            if(web.getSubscriptionType().equals(SubscriptionType.BASIC) && web.getAgeLimit()>=user.getAge()){
+            if(web.getSubscriptionType().equals(SubscriptionType.BASIC) && web.getAgeLimit()<=user.getAge()){
                 countOfBasicWeb++;
             }
             if(web.getSubscriptionType().equals(SubscriptionType.PRO ) && web.getAgeLimit()<=user.getAge()){
