@@ -64,7 +64,7 @@ public class SubscriptionService {
         //find the user;
         Optional<User> optionalUser=userRepository.findById(userId);
         if(!optionalUser.isPresent()){
-            throw new Exception();
+            throw new Exception("User not Found");
         }
         User user=optionalUser.get();
         //find the Subscription
@@ -76,24 +76,24 @@ public class SubscriptionService {
             throw new Exception("Already the best Subscription");
         }
 
-        int changeInPrice=0;
-        int totalPrice=0;
+        Integer changeInPrice=0;
+        Integer totalPrice=0;
         if(currSubscriptionType.equals(SubscriptionType.BASIC)){
             currSubscription.setSubscriptionType(SubscriptionType.PRO);
-            int currentPrice=currSubscription.getTotalAmountPaid();
+            Integer currentPrice=currSubscription.getTotalAmountPaid();
             totalPrice=800+currSubscription.getNoOfScreensSubscribed()*250;
             currSubscription.setTotalAmountPaid(totalPrice);
             changeInPrice=totalPrice-currentPrice;
         }else if(currSubscriptionType.equals(SubscriptionType.PRO)){
             currSubscription.setSubscriptionType(SubscriptionType.ELITE);
-            int currentPrice=currSubscription.getTotalAmountPaid();
+            Integer currentPrice=currSubscription.getTotalAmountPaid();
             totalPrice=1000+currSubscription.getNoOfScreensSubscribed()*350;
             currSubscription.setTotalAmountPaid(totalPrice);
             changeInPrice=totalPrice-currentPrice;
         }
 
         subscriptionRepository.save(currSubscription);
-        return (Integer)changeInPrice;
+        return changeInPrice;
     }
 
     public Integer calculateTotalRevenueOfHotstar(){
@@ -102,12 +102,12 @@ public class SubscriptionService {
         //Hint is to use findAll function from the SubscriptionDb
         List<Subscription> allSubscriptions = subscriptionRepository.findAll();
         if(allSubscriptions.isEmpty()) return null;
-        int totalRevenue=0;
+        Integer totalRevenue=0;
         for(Subscription subscription : allSubscriptions){
             totalRevenue+=subscription.getTotalAmountPaid();
         }
 
-        return (Integer)totalRevenue;
+        return totalRevenue;
     }
 
 }

@@ -35,7 +35,9 @@ public class WebSeriesService {
 
         //updating the rating in production house;
         ProductionHouse productionHouse=updateProductionHouse(webSeriesEntryDto.getProductionHouseId(),webSeriesEntryDto.getRating());
-
+        if(productionHouse == null) {
+            throw new Exception("Production house is not present");
+        }
         //creating webSeries
         WebSeries webSeries=new WebSeries();
               webSeries.setSeriesName(webSeriesEntryDto.getSeriesName());
@@ -47,19 +49,17 @@ public class WebSeriesService {
         //setting FR's
         productionHouse.getWebSeriesList().add(webSeries);
         WebSeries currWeb=webSeriesRepository.save(webSeries);
-        return (Integer) currWeb.getId();
+        return  currWeb.getId();
 
     }
-    public ProductionHouse updateProductionHouse(Integer productionHouseId,double rating) throws Exception{
+    public ProductionHouse updateProductionHouse(Integer productionHouseId,double rating) {
         Optional<ProductionHouse>  optionalProductionHouse=productionHouseRepository.findById(productionHouseId);
         if(!optionalProductionHouse.isPresent()){
-            throw new Exception();
+            return null;
         }
         ProductionHouse currProductionHouse=optionalProductionHouse.get();
         List<WebSeries> listOfWebSeries=currProductionHouse.getWebSeriesList();
-        if(listOfWebSeries.isEmpty()){
-            throw new Exception();
-        }
+
         double sum=rating;
         for(WebSeries web: listOfWebSeries){
             sum+=web.getRating();
