@@ -47,7 +47,7 @@ public class WebSeriesService {
         //setting FR's
         productionHouse.getWebSeriesList().add(webSeries);
         WebSeries currWeb=webSeriesRepository.save(webSeries);
-        return currWeb.getId();
+        return (Integer) currWeb.getId();
 
     }
     public ProductionHouse updateProductionHouse(Integer productionHouseId,double rating) throws Exception{
@@ -57,6 +57,9 @@ public class WebSeriesService {
         }
         ProductionHouse currProductionHouse=optionalProductionHouse.get();
         List<WebSeries> listOfWebSeries=currProductionHouse.getWebSeriesList();
+        if(listOfWebSeries.isEmpty()){
+            throw new Exception();
+        }
         double sum=rating;
         for(WebSeries web: listOfWebSeries){
             sum+=web.getRating();
