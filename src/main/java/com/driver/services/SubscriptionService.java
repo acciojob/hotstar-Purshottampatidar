@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubscriptionService {
@@ -26,7 +27,11 @@ public class SubscriptionService {
 
         //Save The subscription Object into the Db and return the total Amount that user has to pay
         // finding user
-        User user = userRepository.findById(subscriptionEntryDto.getUserId()).get();
+        Optional<User> optionalUser=userRepository.findById(subscriptionEntryDto.getUserId());
+        if(!optionalUser.isPresent()){
+            return null;
+        }
+        User user = optionalUser.get();
 
         //find total amount paid for subscription
         int totalAmount=0;
@@ -57,7 +62,11 @@ public class SubscriptionService {
 
 
         //find the user;
-        User user=userRepository.findById(userId).get();
+        Optional<User> optionalUser=userRepository.findById(userId);
+        if(!optionalUser.isPresent()){
+            throw new Exception();
+        }
+        User user=optionalUser.get();
         //find the Subscription
         Subscription currSubscription=user.getSubscription();
         //current subscription type
@@ -84,8 +93,7 @@ public class SubscriptionService {
         }
 
         subscriptionRepository.save(currSubscription);
-
-        return changeInPrice;
+        return (Integer)changeInPrice;
     }
 
     public Integer calculateTotalRevenueOfHotstar(){
@@ -93,12 +101,13 @@ public class SubscriptionService {
         //We need to find out total Revenue of hotstar : from all the subscriptions combined
         //Hint is to use findAll function from the SubscriptionDb
         List<Subscription> allSubscriptions = subscriptionRepository.findAll();
+        if(allSubscriptions.isEmpty()) return null;
         int totalRevenue=0;
         for(Subscription subscription : allSubscriptions){
             totalRevenue+=subscription.getTotalAmountPaid();
         }
 
-        return totalRevenue;
+        return (Integer)totalRevenue;
     }
 
 }

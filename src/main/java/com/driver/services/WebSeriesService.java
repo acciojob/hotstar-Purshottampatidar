@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class WebSeriesService {
@@ -49,8 +50,12 @@ public class WebSeriesService {
         return currWeb.getId();
 
     }
-    public ProductionHouse updateProductionHouse(Integer productionHouseId,double rating){
-        ProductionHouse currProductionHouse=productionHouseRepository.findById(productionHouseId).get();
+    public ProductionHouse updateProductionHouse(Integer productionHouseId,double rating) throws Exception{
+        Optional<ProductionHouse>  optionalProductionHouse=productionHouseRepository.findById(productionHouseId);
+        if(!optionalProductionHouse.isPresent()){
+            throw new Exception();
+        }
+        ProductionHouse currProductionHouse=optionalProductionHouse.get();
         List<WebSeries> listOfWebSeries=currProductionHouse.getWebSeriesList();
         double sum=rating;
         for(WebSeries web: listOfWebSeries){
