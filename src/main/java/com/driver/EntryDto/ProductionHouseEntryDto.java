@@ -1,9 +1,13 @@
 package com.driver.EntryDto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 public class ProductionHouseEntryDto {
 
     private String name;
-
+    @JsonCreator
     public ProductionHouseEntryDto(String name) {
         this.name = name;
     }
